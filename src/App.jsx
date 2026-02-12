@@ -28,9 +28,10 @@ import {
   Image as ImageIcon,
   BookOpen,
   History,
-  User,     // Icon for Guide
-  Phone,    // Icon for Phone
-  Flag      // Icon for Meeting Point
+  User,     
+  Phone,    
+  Flag,
+  Wifi
 } from 'lucide-react';
 
 // --- Multi-language Resources ---
@@ -40,14 +41,15 @@ const TRANSLATIONS = {
     title: "2026春節釜山行",
     subtitle: "2026 春節之旅",
     nav: { plan: "行程", sky: "天氣", talk: "翻譯", cash: "匯率" },
-    common: { moreInfo: "參考資料", aiIntro: "AI 景點介紹", guide: "導遊" },
+    common: { moreInfo: "參考資料", aiIntro: "AI 景點介紹", guide: "導遊", live: "即時" },
     weather: {
       title: "目前天氣",
       forecast: "未來預報",
       feelsLike: "體感",
-      advice: "2月海風強勁，請務必洋蔥式穿搭。",
-      sunny: "晴朗", cloudy: "多雲", rain: "有雨",
-      dayPrefix: "Day"
+      advice: "2月早晚溫差大，請務必洋蔥式穿搭。",
+      sunny: "晴朗", cloudy: "多雲", rain: "有雨", snow: "下雪",
+      dayPrefix: "Day",
+      source: "資料來源: Open-Meteo"
     },
     history: {
       tab: "探索",
@@ -81,14 +83,15 @@ const TRANSLATIONS = {
     title: "Busan Trip 2026",
     subtitle: "Spring Festival 2026",
     nav: { plan: "Plan", sky: "Sky", talk: "Talk", cash: "Cash" },
-    common: { moreInfo: "More Info", aiIntro: "AI Landmark Intro", guide: "Guide" },
+    common: { moreInfo: "More Info", aiIntro: "AI Landmark Intro", guide: "Guide", live: "LIVE" },
     weather: {
       title: "Current Weather",
       forecast: "Forecast",
       feelsLike: "Feels Like",
-      advice: "February is cold & windy. Dress in layers!",
-      sunny: "Sunny", cloudy: "Cloudy", rain: "Rainy",
-      dayPrefix: "Day"
+      advice: "Large temp difference. Dress in layers!",
+      sunny: "Sunny", cloudy: "Cloudy", rain: "Rainy", snow: "Snow",
+      dayPrefix: "Day",
+      source: "Source: Open-Meteo"
     },
     history: {
       tab: "Explore",
@@ -164,7 +167,7 @@ const HISTORY_DATA = [
   }
 ];
 
-// --- Itinerary Data with Updated Content ---
+// --- Itinerary Data ---
 
 const ITINERARY_DATA = [
   {
@@ -172,7 +175,9 @@ const ITINERARY_DATA = [
     date: "2/14",
     location: { zh: "釜山 - 西面", en: "Busan - Seomyeon" },
     weather: "cloudy",
-    temp: "8°C",
+    temp: "10° / 3°", 
+    realDate: "2026-02-14",
+    isGyeongju: false,
     header_img: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Seomyeon%2C_Busan.jpg",
     img_desc: { zh: "西面商圈繁華夜景", en: "Seomyeon Downtown Night View" },
     activities: [
@@ -207,7 +212,9 @@ const ITINERARY_DATA = [
     date: "2/15",
     location: { zh: "慶州 - 古蹟", en: "Gyeongju - Heritage" },
     weather: "sunny",
-    temp: "5°C",
+    temp: "8° / -1°",
+    realDate: "2026-02-15",
+    isGyeongju: true,
     header_img: "https://korea.ggogo.com/tour/images/scenery/gyeongju/sukgulam_01_b.jpg",
     img_desc: { zh: "新羅佛教藝術與古蹟", en: "Silla Buddhist Heritage" },
     activities: [
@@ -254,7 +261,9 @@ const ITINERARY_DATA = [
     date: "2/16",
     location: { zh: "海雲台", en: "Haeundae" },
     weather: "sunny",
-    temp: "7°C",
+    temp: "9° / 1°",
+    realDate: "2026-02-16",
+    isGyeongju: false,
     header_img: "https://res.klook.com/image/upload/w_750,h_469,c_fill,q_85/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/iewij5wcrmvdefurbnuv.jpg",
     img_desc: { zh: "海雲台蔚藍海岸線", en: "Haeundae Coastline" },
     activities: [
@@ -301,7 +310,9 @@ const ITINERARY_DATA = [
     date: "2/17",
     location: { zh: "松島/南浦洞", en: "Songdo/Nampodong" },
     weather: "cloudy",
-    temp: "9°C",
+    temp: "11° / 4°",
+    realDate: "2026-02-17",
+    isGyeongju: false,
     header_img: "https://res.klook.com/images/fl_lossy.progressive,q_65/c_fill,w_3000,h_1784/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/ulhfkzn47rllnnvupgtb/%E6%9D%BE%E5%B3%B6%E6%B5%B7%E4%B8%8A%E7%BA%9C%E8%BB%8A%E9%96%80%E7%A5%A8-Klook%E5%AE%A2%E8%B7%AF.jpg",
     img_desc: { zh: "松島海上纜車絕景", en: "Songdo Marine Cable Car" },
     activities: [
@@ -348,7 +359,9 @@ const ITINERARY_DATA = [
     date: "2/18",
     location: { zh: "甘川洞/返家", en: "Gamcheon/Home" },
     weather: "sunny",
-    temp: "10°C",
+    temp: "10° / 2°",
+    realDate: "2026-02-18",
+    isGyeongju: false,
     header_img: "https://www.settour.com.tw/ss_img/info/location/PUS/S0/PUS0000072/PUS0000072_136913.jpg",
     img_desc: { zh: "甘川洞文化村全景", en: "Gamcheon Village Panorama" },
     activities: [
@@ -451,6 +464,7 @@ const WeatherIcon = ({ type, size = 24, className = "" }) => {
     case 'sunny': return <Sun size={size} className={`text-red-500 ${className}`} />;
     case 'cloudy': return <CloudSun size={size} className={`text-stone-400 ${className}`} />;
     case 'rain': return <CloudRain size={size} className={`text-blue-800 ${className}`} />;
+    case 'snow': return <Snowflake size={size} className={`text-blue-300 ${className}`} />;
     default: return <Sun size={size} className={`text-red-500 ${className}`} />;
   }
 };
@@ -482,12 +496,22 @@ const SafeImage = ({ src, alt, className }) => {
 };
 
 
-const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
+const ItineraryView = ({ onSelectDay, selectedDay, lang, weatherData }) => {
   const currentDayData = selectedDay === 0 
     ? null 
     : (ITINERARY_DATA.find(d => d.day === selectedDay) || ITINERARY_DATA[0]);
     
   const t = TRANSLATIONS[lang];
+
+  // Logic to determine display weather
+  let displayTemp = currentDayData?.temp;
+  let displayWeather = currentDayData?.weather;
+  const realWeather = weatherData[currentDayData?.realDate];
+
+  if (realWeather) {
+    displayTemp = `${Math.round(realWeather.max)}° / ${Math.round(realWeather.min)}°`;
+    displayWeather = realWeather.type;
+  }
 
   const handleSearch = (activityTitle) => {
     const prefix = lang === 'zh' ? "釜山 " : "Busan ";
@@ -600,7 +624,7 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent pointer-events-none"></div>
                 
-                {/* Image Caption */}
+                {/* Image Caption - Small & Elegant */}
                 <div className="absolute bottom-3 left-4 right-4 pointer-events-none flex items-end">
                     <div className="bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
                         <div className="flex items-center gap-1.5 text-white/90">
@@ -641,11 +665,12 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                     </h2>
                 </div>
                 
-                {/* Weather Pill */}
-                <div className="flex flex-col items-center bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
+                {/* Weather Pill (Updated with Real Weather Logic) */}
+                <div className={`flex flex-col items-center px-3 py-1.5 rounded-lg border shadow-sm transition-all ${realWeather ? 'bg-blue-600 border-blue-600 text-white' : 'bg-blue-50 border-blue-100 text-blue-900'}`}>
                     <div className="flex items-center gap-2">
-                        <WeatherIcon type={currentDayData.weather} size={16} />
-                        <span className="text-sm font-bold text-blue-900">{currentDayData.temp}</span>
+                        <WeatherIcon type={displayWeather} size={16} className={realWeather ? 'text-white' : ''} />
+                        <span className="text-sm font-bold">{displayTemp}</span>
+                        {realWeather && <span className="text-[10px] bg-white/20 px-1 rounded">{t.common.live}</span>}
                     </div>
                 </div>
                 </div>
@@ -692,7 +717,7 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                             )}
                             
                             {/* Google Search Button - Only show if not flight/hotel/meeting */}
-                            {activity.time !== "Arrival" && activity.time !== "Stay" && activity.time !== "10:55" && activity.time !== "13:25" && activity.time !== "15:00" && (
+                            {activity.time !== "Arrival" && activity.time !== "Stay" && activity.time !== "10:55" && activity.time !== "13:25" && activity.time !== "Flight" && activity.time !== "15:00" && (
                                 <button
                                     onClick={() => handleSearch(activity.title[lang])}
                                     className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-blue-900/70 hover:text-blue-950 bg-white border border-stone-200 hover:bg-blue-50 hover:border-blue-200 px-3 py-1.5 rounded-full transition-all w-fit shadow-sm"
@@ -713,12 +738,16 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
   );
 };
 
-const WeatherWidget = ({ selectedDay, lang }) => {
-  const today = selectedDay === 0 
-    ? ITINERARY_DATA[0] // Default to Day 1 if viewing history
-    : (ITINERARY_DATA.find(d => d.day === selectedDay) || ITINERARY_DATA[0]);
-    
+const WeatherWidget = ({ selectedDay, lang, weatherData }) => {
+  // If selectedDay is 0 (History), use today's real forecast (or Day 1)
+  const todayItem = selectedDay === 0 ? ITINERARY_DATA[0] : (ITINERARY_DATA.find(d => d.day === selectedDay) || ITINERARY_DATA[0]);
   const t = TRANSLATIONS[lang];
+  const realWeather = weatherData[todayItem.realDate];
+
+  // Dynamic Weather Display Logic
+  const displayWeather = realWeather ? realWeather.type : todayItem.weather;
+  const displayTemp = realWeather ? `${Math.round(realWeather.max)}° / ${Math.round(realWeather.min)}°` : todayItem.temp;
+  const isLive = !!realWeather;
 
   return (
     <div className="space-y-4 pb-24 animate-fade-in">
@@ -733,27 +762,43 @@ const WeatherWidget = ({ selectedDay, lang }) => {
         <div className="relative z-10">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-blue-200 font-bold text-[10px] tracking-[0.2em] uppercase mb-1">{t.weather.title}</p>
-              <h2 className="text-3xl font-bold text-white tracking-tight">{today.location[lang].split(' - ')[0]}</h2>
+              <p className="text-blue-200 font-bold text-[10px] tracking-[0.2em] uppercase mb-1 flex items-center gap-2">
+                 {t.weather.title}
+                 {isLive && <span className="bg-red-500 text-white px-1.5 rounded animate-pulse">{t.common.live}</span>}
+              </p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">{todayItem.location[lang].split(' - ')[0]}</h2>
             </div>
             <div className="text-right">
-                 <WeatherIcon type={today.weather} size={32} className="text-red-500" />
+                 <WeatherIcon type={displayWeather} size={32} className="text-red-500" />
             </div>
           </div>
 
           <div className="mt-8 flex items-center justify-between">
-            <span className="text-6xl font-light tracking-tighter text-stone-50">{today.temp}</span>
+            <span className="text-6xl font-light tracking-tighter text-stone-50">{displayTemp}</span>
             <div className="flex flex-col items-end">
                <span className="text-lg font-bold capitalize text-white">
-                 {t.weather[today.weather]}
+                 {t.weather[displayWeather]}
                </span>
                <span className="text-xs text-blue-200 mt-1">{t.weather.feelsLike} -2°C</span>
             </div>
           </div>
 
           <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-lg p-3 flex items-center gap-3 border border-white/10">
-             <Snowflake size={14} className="text-blue-200" />
-             <span className="text-xs font-medium text-blue-100">{t.weather.advice}</span>
+             {isLive ? <Wifi size={14} className="text-green-400" /> : <Snowflake size={14} className="text-blue-200" />}
+             
+             {isLive ? (
+               <a 
+                 href="https://open-meteo.com/" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="text-xs font-medium text-blue-100 hover:text-white underline decoration-blue-400/50 underline-offset-2 flex items-center gap-1 transition-colors"
+               >
+                 {t.weather.source}
+                 <ExternalLink size={10} />
+               </a>
+             ) : (
+               <span className="text-xs font-medium text-blue-100">{t.weather.advice}</span>
+             )}
           </div>
         </div>
       </div>
@@ -765,19 +810,24 @@ const WeatherWidget = ({ selectedDay, lang }) => {
           {t.weather.forecast}
         </h3>
         <div className="space-y-2">
-          {ITINERARY_DATA.map((day) => (
+          {ITINERARY_DATA.map((day) => {
+             const dayReal = weatherData[day.realDate];
+             const dayTemp = dayReal ? `${Math.round(dayReal.max)}° / ${Math.round(dayReal.min)}°` : day.temp;
+             const dayWeather = dayReal ? dayReal.type : day.weather;
+
+             return (
              <div key={day.day} className="flex items-center justify-between p-3 rounded-lg hover:bg-[#FDFBF7] transition-colors cursor-pointer group border border-transparent hover:border-stone-100">
                <div className="flex items-center gap-4">
                  <div className="text-stone-300 group-hover:text-red-500 transition-colors">
-                   <WeatherIcon type={day.weather} size={18} />
+                   <WeatherIcon type={dayWeather} size={18} />
                  </div>
                  <div>
                    <p className="font-bold text-blue-950 text-sm">{day.date}</p>
                  </div>
                </div>
-               <span className="font-medium text-stone-500 text-xs">{day.temp}</span>
+               <span className={`font-medium text-xs ${dayReal ? 'text-blue-600 font-bold' : 'text-stone-500'}`}>{dayTemp}</span>
              </div>
-          ))}
+          )})}
         </div>
       </div>
     </div>
@@ -1072,6 +1122,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('itinerary');
   const [selectedDay, setSelectedDay] = useState(1);
   const [lang, setLang] = useState('zh'); 
+  const [weatherData, setWeatherData] = useState({});
 
   // Auto-detect language
   useEffect(() => {
@@ -1083,6 +1134,56 @@ export default function App() {
     }
   }, []);
 
+  // Fetch Real Weather Logic
+  useEffect(() => {
+    const fetchWeather = async () => {
+      // 1. Define locations
+      const locations = [
+        { name: 'Busan', lat: 35.1796, lon: 129.0756 }, // Days 1, 3, 4, 5
+        { name: 'Gyeongju', lat: 35.8562, lon: 129.2247 } // Day 2
+      ];
+
+      const newWeatherData = {};
+
+      for (const loc of locations) {
+        try {
+          const response = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo`
+          );
+          const data = await response.json();
+          
+          if (data.daily) {
+             data.daily.time.forEach((date, index) => {
+                // Map WMO codes to simple types
+                let weatherType = 'sunny';
+                const code = data.daily.weathercode[index];
+                if (code > 2) weatherType = 'cloudy';
+                if (code > 50) weatherType = 'rain';
+                if (code > 70) weatherType = 'snow';
+
+                // Check which itinerary day this matches
+                ITINERARY_DATA.forEach(day => {
+                    const matchesLoc = (day.isGyeongju && loc.name === 'Gyeongju') || (!day.isGyeongju && loc.name === 'Busan');
+                    if (day.realDate === date && matchesLoc) {
+                       newWeatherData[date] = {
+                         min: data.daily.temperature_2m_min[index],
+                         max: data.daily.temperature_2m_max[index],
+                         type: weatherType
+                       };
+                    }
+                });
+             });
+          }
+        } catch (e) {
+          console.error("Weather fetch failed", e);
+        }
+      }
+      setWeatherData(newWeatherData);
+    };
+
+    fetchWeather();
+  }, []);
+
   const toggleLanguage = () => {
     setLang(prev => prev === 'zh' ? 'en' : 'zh');
   };
@@ -1091,11 +1192,11 @@ export default function App() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'itinerary': return <ItineraryView onSelectDay={setSelectedDay} selectedDay={selectedDay} lang={lang} />;
-      case 'weather': return <WeatherWidget selectedDay={selectedDay} lang={lang} />;
+      case 'itinerary': return <ItineraryView onSelectDay={setSelectedDay} selectedDay={selectedDay} lang={lang} weatherData={weatherData} />;
+      case 'weather': return <WeatherWidget selectedDay={selectedDay} lang={lang} weatherData={weatherData} />;
       case 'language': return <LanguageCards lang={lang} />;
       case 'calculator': return <CurrencyConverter lang={lang} />;
-      default: return <ItineraryView lang={lang} />;
+      default: return <ItineraryView lang={lang} weatherData={weatherData} />;
     }
   };
 
@@ -1189,3 +1290,4 @@ const NavButton = ({ active, onClick, icon, label }) => (
     </span>
   </button>
 );
+
