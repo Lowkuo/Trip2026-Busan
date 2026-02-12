@@ -27,7 +27,10 @@ import {
   Globe,
   Image as ImageIcon,
   BookOpen,
-  History
+  History,
+  User,     // Icon for Guide
+  Phone,    // Icon for Phone
+  Flag      // Icon for Meeting Point
 } from 'lucide-react';
 
 // --- Multi-language Resources ---
@@ -37,7 +40,7 @@ const TRANSLATIONS = {
     title: "2026春節釜山行",
     subtitle: "2026 春節之旅",
     nav: { plan: "行程", sky: "天氣", talk: "翻譯", cash: "匯率" },
-    common: { moreInfo: "參考資料", aiIntro: "AI 景點介紹" },
+    common: { moreInfo: "參考資料", aiIntro: "AI 景點介紹", guide: "導遊" },
     weather: {
       title: "目前天氣",
       forecast: "未來預報",
@@ -78,7 +81,7 @@ const TRANSLATIONS = {
     title: "Busan Trip 2026",
     subtitle: "Spring Festival 2026",
     nav: { plan: "Plan", sky: "Sky", talk: "Talk", cash: "Cash" },
-    common: { moreInfo: "More Info", aiIntro: "AI Landmark Intro" },
+    common: { moreInfo: "More Info", aiIntro: "AI Landmark Intro", guide: "Guide" },
     weather: {
       title: "Current Weather",
       forecast: "Forecast",
@@ -161,7 +164,7 @@ const HISTORY_DATA = [
   }
 ];
 
-// --- Itinerary Data with Direct Images ---
+// --- Itinerary Data with Updated Content ---
 
 const ITINERARY_DATA = [
   {
@@ -170,33 +173,32 @@ const ITINERARY_DATA = [
     location: { zh: "釜山 - 西面", en: "Busan - Seomyeon" },
     weather: "cloudy",
     temp: "8°C",
-    // Day 1: Updated to new Wikimedia URL
     header_img: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Seomyeon%2C_Busan.jpg",
     img_desc: { zh: "西面商圈繁華夜景", en: "Seomyeon Downtown Night View" },
     activities: [
       { 
-        time: "Arrival", 
-        title: { zh: "金海國際機場", en: "Gimhae Int'l Airport" }, 
+        time: "10:55", 
+        title: { zh: "集合: 桃園機場二航廈", en: "Meeting: Taoyuan Airport T2" }, 
+        icon: <Flag size={18} />, 
+        note: { zh: "24號櫃檯", en: "Counter 24" } 
+      },
+      { 
+        time: "Flight", 
+        title: { zh: "去程: BX794 釜山航空", en: "Dep: BX794 Air Busan" }, 
         icon: <Plane size={18} />, 
-        note: { zh: "領取SIM卡 (每人1G)", en: "Pick up SIM Card (1G)" } 
+        note: { zh: "13:25 - 17:00 (二航廈)", en: "13:25 - 17:00 (Terminal 2)" } 
       },
       { 
-        time: "Afternoon", 
-        title: { zh: "西面鬧區 (美食大探索)", en: "Seomyeon Street Food" }, 
+        time: "Night", 
+        title: { zh: "西面鬧區", en: "Seomyeon Downtown" }, 
         icon: <ShoppingBag size={18} />, 
-        note: { zh: "自由逛街 1~1.5hr", en: "Free time 1.5hr" } 
-      },
-      { 
-        time: "Dinner", 
-        title: { zh: "畜產直營美味豬肉拼盤", en: "Premium Pork BBQ" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "含韓式蒸蛋+拉麵吃到飽", en: "Inc. Steamed Egg + Ramen" } 
+        note: { zh: "釜山最熱鬧的購物商圈", en: "Busan's busiest shopping district" } 
       },
       { 
         time: "Stay", 
-        title: { zh: "GNB / TT / CONNECT 飯店", en: "GNB / TT / CONNECT Hotel" }, 
+        title: { zh: "GNB Hotel", en: "GNB Hotel" }, 
         icon: <MapPin size={18} />, 
-        note: { zh: "同級市區飯店", en: "City Center Hotel" } 
+        note: { zh: "002-82-51-243-5555", en: "+82-51-243-5555" } 
       }
     ]
   },
@@ -206,47 +208,44 @@ const ITINERARY_DATA = [
     location: { zh: "慶州 - 古蹟", en: "Gyeongju - Heritage" },
     weather: "sunny",
     temp: "5°C",
-    // Day 2: 석굴암 (Seokguram)
     header_img: "https://korea.ggogo.com/tour/images/scenery/gyeongju/sukgulam_01_b.jpg",
     img_desc: { zh: "新羅佛教藝術與古蹟", en: "Silla Buddhist Heritage" },
     activities: [
       { 
         time: "Morning", 
-        title: { zh: "佛國寺 & 石窟庵", en: "Bulguksa & Seokguram" }, 
+        title: { zh: "佛國寺", en: "Bulguksa Temple" }, 
         icon: <Landmark size={18} />, 
-        note: { zh: "世界文化遺產", en: "UNESCO World Heritage" },
-        ai_desc: {
-          zh: "佛國寺是新羅佛教藝術的精華，創建於八世紀。其多寶塔與釋迦塔代表了新羅的精湛工藝。石窟庵則供奉了新羅時期最美麗的佛像，是東方佛教藝術的傑作。",
-          en: "Bulguksa Temple, built in the 8th century, is the essence of Silla Buddhist art, famed for its stunning pagodas. Seokguram Grotto houses a beautiful Buddha statue, a masterpiece of Eastern Buddhist sculpture."
-        }
+        note: { zh: "世界文化遺產", en: "UNESCO World Heritage" }
       },
       { 
-        time: "Lunch", 
-        title: { zh: "南瓜鴨風味餐", en: "Pumpkin Smoked Duck" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "評價極高在地美食", en: "Famous Local Dish" } 
-      },
-      { 
-        time: "Afternoon", 
-        title: { zh: "皇理團路 & 瞻星臺", en: "Hwangnidan-gil & Cheomseongdae" }, 
+        time: "Visit", 
+        title: { zh: "皇理團路", en: "Hwangnidan-gil" }, 
         icon: <Camera size={18} />, 
-        note: { zh: "文青散步路線", en: "Trendy Walking Street" } 
+        note: { zh: "韓屋文青咖啡街", en: "Hanok Cafe Street" } 
+      },
+      { 
+        time: "Visit", 
+        title: { zh: "瞻星臺", en: "Cheomseongdae" }, 
+        icon: <Landmark size={18} />, 
+        note: { zh: "東方現存最古老天文台", en: "Oldest observatory in the East" } 
+      },
+      { 
+        time: "Visit", 
+        title: { zh: "石窟庵石窟", en: "Seokguram Grotto" }, 
+        icon: <Landmark size={18} />, 
+        note: { zh: "國寶級佛教藝術", en: "National Treasure Buddhist Art" } 
       },
       { 
         time: "Evening", 
         title: { zh: "雁鴨池 (東宮與月池)", en: "Donggung Palace & Wolji Pond" }, 
         icon: <Landmark size={18} />, 
-        note: { zh: "CNN推薦絕美夜景", en: "Beautiful Night View" },
-        ai_desc: {
-          zh: "雁鴨池原是新羅王宮的離宮，用於設宴款待貴賓。夜間點燈後建築倒映水面，景色絕美。它不僅是古建築，更是新羅繁榮時期皇室美學的象徵。",
-          en: "Formerly the Silla Crown Prince’s palace, this pond and garden complex was used for royal banquets. The illuminated buildings reflected in the water offer a stunning view, symbolizing Silla's aesthetics."
-        }
+        note: { zh: "新羅王宮的離宮", en: "Secondary Palace of Silla" } 
       },
       { 
-        time: "Dinner", 
-        title: { zh: "星菜盤傳統菜包肉", en: "Ssambap (Leaf Wraps)" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "慶州必吃特色餐", en: "Traditional Gyeongju Meal" } 
+        time: "Stay", 
+        title: { zh: "GNB Hotel", en: "GNB Hotel" }, 
+        icon: <MapPin size={18} />, 
+        note: { zh: "002-82-51-243-5555", en: "+82-51-243-5555" } 
       }
     ]
   },
@@ -256,33 +255,44 @@ const ITINERARY_DATA = [
     location: { zh: "海雲台", en: "Haeundae" },
     weather: "sunny",
     temp: "7°C",
-    // Day 3: Haeundae Beach
     header_img: "https://res.klook.com/image/upload/w_750,h_469,c_fill,q_85/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/iewij5wcrmvdefurbnuv.jpg",
     img_desc: { zh: "海雲台蔚藍海岸線", en: "Haeundae Coastline" },
     activities: [
       { 
-        time: "Morning", 
-        title: { zh: "海雲台天空膠囊列車", en: "Haeundae Sky Capsule" }, 
+        time: "Activity", 
+        title: { zh: "海雲台藍線公園", en: "Haeundae Blueline Park" }, 
         icon: <Train size={18} />, 
-        note: { zh: "尾浦-青沙浦 (4人一車)", en: "Mipo-Cheongsapo (4p/car)" } 
+        note: { zh: "搭乘天空膠囊列車", en: "Sky Capsule Train" } 
       },
       { 
         time: "Spot", 
-        title: { zh: "青沙浦紅白燈塔", en: "Twin Lighthouses" }, 
+        title: { zh: "青沙浦", en: "Cheongsapo" }, 
         icon: <Anchor size={18} />, 
-        note: { zh: "IG打卡聖地", en: "Photo Spot" } 
+        note: { zh: "絕美海景與雙燈塔", en: "Twin Lighthouses" } 
       },
       { 
-        time: "Afternoon", 
-        title: { zh: "CLUBD OASIS 汗蒸幕", en: "CLUBD OASIS Spa" }, 
+        time: "Visit", 
+        title: { zh: "海雲台傳統市場", en: "Haeundae Traditional Market" }, 
+        icon: <ShoppingBag size={18} />, 
+        note: { zh: "品嚐道地小吃", en: "Local Street Food" } 
+      },
+      { 
+        time: "Relax", 
+        title: { zh: "Club D Oasis", en: "Club D Oasis" }, 
         icon: <Waves size={18} />, 
-        note: { zh: "多喝水、敷面膜鎮定肌膚", en: "Stay hydrated" } 
+        note: { zh: "海景汗蒸幕體驗", en: "Spa & Jimjilbang" } 
       },
       { 
-        time: "Dinner", 
-        title: { zh: "長腳蟹豪華套餐", en: "Snow Crab Feast" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "賀歲大餐 + 宵夜炸雞", en: "New Year Dinner + Fried Chicken" } 
+        time: "View", 
+        title: { zh: "釜山 X The Sky", en: "Busan X The Sky" }, 
+        icon: <Camera size={18} />, 
+        note: { zh: "摩天樓觀景台", en: "Skyscraper Observatory" } 
+      },
+      { 
+        time: "Stay", 
+        title: { zh: "新羅舒泰西釜山", en: "Shilla Stay Seobusan" }, 
+        icon: <MapPin size={18} />, 
+        note: { zh: "002-82-51-661-9000", en: "+82-51-661-9000" } 
       }
     ]
   },
@@ -292,39 +302,44 @@ const ITINERARY_DATA = [
     location: { zh: "松島/南浦洞", en: "Songdo/Nampodong" },
     weather: "cloudy",
     temp: "9°C",
-    // Day 4: Songdo Cable Car
     header_img: "https://res.klook.com/images/fl_lossy.progressive,q_65/c_fill,w_3000,h_1784/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/ulhfkzn47rllnnvupgtb/%E6%9D%BE%E5%B3%B6%E6%B5%B7%E4%B8%8A%E7%BA%9C%E8%BB%8A%E9%96%80%E7%A5%A8-Klook%E5%AE%A2%E8%B7%AF.jpg",
     img_desc: { zh: "松島海上纜車絕景", en: "Songdo Marine Cable Car" },
     activities: [
       { 
-        time: "Morning", 
-        title: { zh: "松島海上纜車 & 龍宮雲橋", en: "Songdo Marine Cable Car" }, 
+        time: "Shop", 
+        title: { zh: "Marina K.C 彩妝名品", en: "Marina K.C Cosmetic" }, 
+        icon: <ShoppingBag size={18} />, 
+        note: { zh: "美妝購物", en: "Cosmetic Shopping" } 
+      },
+      { 
+        time: "Activity", 
+        title: { zh: "松島海上纜車 & 龍宮雲橋", en: "Songdo Cable Car & Bridge" }, 
         icon: <Ship size={18} />, 
-        note: { zh: "若遇維修改去五六島", en: "Skywalk if under maintenance" } 
+        note: { zh: "飽覽松島海景", en: "Ocean View" } 
       },
       { 
         time: "Spot", 
-        title: { zh: "白淺灘文化壁畫村", en: "Huinnyeoul Culture Village" }, 
+        title: { zh: "白險灘文化壁畫村", en: "Huinnyeoul Culture Village" }, 
         icon: <Camera size={18} />, 
         note: { zh: "絕影海岸散步路", en: "Coastal Walk" } 
       },
       { 
-        time: "Afternoon", 
-        title: { zh: "ARTE MUSEUM", en: "ARTE MUSEUM" }, 
+        time: "Art", 
+        title: { zh: "Arte Museum", en: "Arte Museum" }, 
         icon: <Waves size={18} />, 
-        note: { zh: "沉浸式媒體藝術展", en: "Immersive Media Art" } 
+        note: { zh: "世界最大沈浸式藝術展", en: "Immersive Media Art" } 
       },
       { 
-        time: "Shopping", 
-        title: { zh: "南浦洞/BIFF/國際市場", en: "Nampodong/BIFF Square" }, 
+        time: "Market", 
+        title: { zh: "國際市場", en: "Gukje Market" }, 
         icon: <ShoppingBag size={18} />, 
-        note: { zh: "晚餐自理 (發放₩10000)", en: "Dinner on own (₩10000 provided)" } 
+        note: { zh: "南浦洞、光復洞、BIFF廣場", en: "Nampodong, BIFF Square" } 
       },
       { 
-        time: "Lunch", 
-        title: { zh: "韓式豬腳風味餐", en: "Braised Pork Knuckle" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "在地傳統口味", en: "Local Specialty" } 
+        time: "Stay", 
+        title: { zh: "新羅舒泰西釜山", en: "Shilla Stay Seobusan" }, 
+        icon: <MapPin size={18} />, 
+        note: { zh: "002-82-51-661-9000", en: "+82-51-661-9000" } 
       }
     ]
   },
@@ -334,31 +349,26 @@ const ITINERARY_DATA = [
     location: { zh: "甘川洞/返家", en: "Gamcheon/Home" },
     weather: "sunny",
     temp: "10°C",
-    // Day 5: Gamcheon
     header_img: "https://www.settour.com.tw/ss_img/info/location/PUS/S0/PUS0000072/PUS0000072_136913.jpg",
     img_desc: { zh: "甘川洞文化村全景", en: "Gamcheon Village Panorama" },
     activities: [
       { 
         time: "Morning", 
-        title: { zh: "甘川洞文化村", en: "Gamcheon Culture Village" }, 
+        title: { zh: "甘川文化村", en: "Gamcheon Culture Village" }, 
         icon: <MapPin size={18} />, 
-        note: { zh: "贈送地圖 (停留1hr)", en: "Free Map (1hr stay)" },
-        ai_desc: {
-          zh: "甘川洞原是韓戰難民聚集地，後透過「夢想釜山馬丘比丘」計畫重生。層疊錯落的彩色房屋與街頭藝術，使其成為充滿活力的現代藝術景觀。小王子雕塑是必打卡的文化符號。",
-          en: "Originally a refugee settlement, Gamcheon was transformed into a vibrant cultural landmark through an art project. Its colorful tiered houses earned it the nickname 'Busan's Machu Picchu'."
-        }
+        note: { zh: "積木般的彩色房子", en: "Colorful tiered houses" } 
       },
       { 
-        time: "Lunch", 
-        title: { zh: "安東粉絲燉雞", en: "Andong Jjimdak" }, 
-        icon: <Utensils size={18} />, 
-        note: { zh: "最後一餐道地美味", en: "Last Korean Meal" } 
-      },
-      { 
-        time: "Return", 
-        title: { zh: "金海機場 -> 桃園", en: "Gimhae -> Taoyuan" }, 
+        time: "15:00", 
+        title: { zh: "回程: BX791 釜山航空", en: "Return: BX791 Air Busan" }, 
         icon: <Plane size={18} />, 
-        note: { zh: "整理行囊，溫暖的家", en: "Sweet Home" } 
+        note: { zh: "15:00 - 16:40 (二航廈)", en: "15:00 - 16:40 (Terminal 2)" } 
+      },
+      { 
+        time: "Arrival", 
+        title: { zh: "抵達桃園機場", en: "Arrive Taoyuan Airport" }, 
+        icon: <Plane size={18} />, 
+        note: { zh: "溫暖的家", en: "Sweet Home" } 
       }
     ]
   }
@@ -401,7 +411,7 @@ const PHRASES_DATA = [
       { ko: "메뉴판 주세요", zh: "請給我菜單", en: "Menu please", pron: "Me-nyu-pan ju-se-yo" },
       { ko: "이거 주세요", zh: "請給我這個", en: "This one please", pron: "I-geo ju-se-yo" },
       { ko: "물 좀 주세요", zh: "請給我水", en: "Water please", pron: "Mul jom ju-se-yo" },
-      { ko: "安 맵게 해주세요", zh: "請做不辣的", en: "Not spicy please", pron: "An maep-ge hae-ju-se-yo" },
+      { ko: "안 맵게 해주세요", zh: "請做不辣的", en: "Not spicy please", pron: "An maep-ge hae-ju-se-yo" },
       { ko: "맛있어요", zh: "很好吃", en: "Delicious", pron: "Ma-si-sseo-yo" },
       { ko: "계산해 주세요", zh: "請結帳", en: "Bill please", pron: "Gye-san-hae ju-se-yo" },
     ]
@@ -590,7 +600,7 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent pointer-events-none"></div>
                 
-                {/* Image Caption - Small & Elegant */}
+                {/* Image Caption */}
                 <div className="absolute bottom-3 left-4 right-4 pointer-events-none flex items-end">
                     <div className="bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
                         <div className="flex items-center gap-1.5 text-white/90">
@@ -604,6 +614,25 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
             </div>
             
             <div className="p-6">
+                {/* === Day 1 Guide Info Block === */}
+                {currentDayData.day === 1 && (
+                    <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-100 rounded-full text-blue-600">
+                                <User size={20} />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">{t.common.guide}</p>
+                                <p className="text-sm font-bold text-blue-950">李奎翰</p>
+                            </div>
+                        </div>
+                        <a href="tel:0937654566" className="flex items-center gap-1 bg-white border border-blue-200 text-blue-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-colors">
+                            <Phone size={14} />
+                            <span>0937-654566</span>
+                        </a>
+                    </div>
+                )}
+
                 {/* Header Info */}
                 <div className="flex justify-between items-center border-b border-stone-100 pb-4 mb-4">
                 <div>
@@ -627,7 +656,7 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                     <div key={index} className="flex gap-4 group">
                     {/* Timeline Line */}
                     <div className="flex flex-col items-center w-8 pt-2">
-                        <div className="w-2.5 h-2.5 bg-white border-[3px] border-red-500 rounded-full z-10 group-hover:scale-125 transition-transform duration-300 shadow-sm"></div>
+                        <div className={`w-2.5 h-2.5 rounded-full border-[3px] z-10 group-hover:scale-125 transition-transform duration-300 shadow-sm ${index === 0 && currentDayData.day === 1 ? 'bg-red-500 border-red-500' : 'bg-white border-red-500'}`}></div>
                         {index !== currentDayData.activities.length - 1 && (
                         <div className="w-[1px] h-full bg-stone-200 -mt-1 mb-[-8px]"></div>
                         )}
@@ -636,7 +665,7 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                     {/* Content Card */}
                     <div className="flex-1 pb-8">
                         <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-black text-stone-400 font-mono tracking-wider uppercase bg-stone-100 px-1.5 py-0.5 rounded">
+                        <span className={`text-[10px] font-black font-mono tracking-wider uppercase px-1.5 py-0.5 rounded ${index === 0 && currentDayData.day === 1 ? 'text-red-600 bg-red-100' : 'text-stone-400 bg-stone-100'}`}>
                             {activity.time}
                         </span>
                         </div>
@@ -662,14 +691,16 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang }) => {
                             </p>
                             )}
                             
-                            {/* Google Search Button */}
-                            <button
-                                onClick={() => handleSearch(activity.title[lang])}
-                                className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-blue-900/70 hover:text-blue-950 bg-white border border-stone-200 hover:bg-blue-50 hover:border-blue-200 px-3 py-1.5 rounded-full transition-all w-fit shadow-sm"
-                            >
-                                <Search size={12} />
-                                {t.common.moreInfo}
-                            </button>
+                            {/* Google Search Button - Only show if not flight/hotel/meeting */}
+                            {activity.time !== "Arrival" && activity.time !== "Stay" && activity.time !== "10:55" && activity.time !== "13:25" && activity.time !== "15:00" && (
+                                <button
+                                    onClick={() => handleSearch(activity.title[lang])}
+                                    className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-blue-900/70 hover:text-blue-950 bg-white border border-stone-200 hover:bg-blue-50 hover:border-blue-200 px-3 py-1.5 rounded-full transition-all w-fit shadow-sm"
+                                >
+                                    <Search size={12} />
+                                    {t.common.moreInfo}
+                                </button>
+                            )}
                         </div>
                     </div>
                     </div>
