@@ -49,7 +49,7 @@ const TRANSLATIONS = {
       advice: "2月早晚溫差大，請務必洋蔥式穿搭。",
       sunny: "晴朗", cloudy: "多雲", rain: "有雨", snow: "下雪",
       dayPrefix: "Day",
-      source: "前往 Google Weather 查看詳情"
+      source: "資料來源: Open-Meteo"
     },
     history: {
       tab: "探索",
@@ -91,7 +91,7 @@ const TRANSLATIONS = {
       advice: "Large temp difference. Dress in layers!",
       sunny: "Sunny", cloudy: "Cloudy", rain: "Rainy", snow: "Snow",
       dayPrefix: "Day",
-      source: "Check on Google Weather"
+      source: "Source: Open-Meteo"
     },
     history: {
       tab: "Explore",
@@ -503,6 +503,16 @@ const ItineraryView = ({ onSelectDay, selectedDay, lang, weatherData }) => {
     
   const t = TRANSLATIONS[lang];
 
+  // Logic to determine display weather
+  let displayTemp = currentDayData?.temp;
+  let displayWeather = currentDayData?.weather;
+  const realWeather = weatherData[currentDayData?.realDate];
+
+  if (realWeather) {
+    displayTemp = `${Math.round(realWeather.max)}° / ${Math.round(realWeather.min)}°`;
+    displayWeather = realWeather.type;
+  }
+
   const handleSearch = (activityTitle) => {
     const prefix = lang === 'zh' ? "釜山 " : "Busan ";
     const query = prefix + activityTitle;
@@ -739,9 +749,6 @@ const WeatherWidget = ({ selectedDay, lang, weatherData }) => {
   const displayTemp = realWeather ? `${Math.round(realWeather.max)}° / ${Math.round(realWeather.min)}°` : todayItem.temp;
   const isLive = !!realWeather;
 
-  // New Google Weather Link Construction
-  const googleWeatherUrl = `https://www.google.com/search?q=${encodeURIComponent(todayItem.location[lang].split(' - ')[0] + (lang === 'zh' ? ' 天氣' : ' Weather'))}`;
-
   return (
     <div className="space-y-4 pb-24 animate-fade-in">
       {/* Main Weather Display */}
@@ -781,7 +788,7 @@ const WeatherWidget = ({ selectedDay, lang, weatherData }) => {
              
              {isLive ? (
                <a 
-                 href={googleWeatherUrl}
+                 href="https://open-meteo.com/" 
                  target="_blank" 
                  rel="noopener noreferrer"
                  className="text-xs font-medium text-blue-100 hover:text-white underline decoration-blue-400/50 underline-offset-2 flex items-center gap-1 transition-colors"
@@ -827,7 +834,287 @@ const WeatherWidget = ({ selectedDay, lang, weatherData }) => {
   );
 };
 
-// ... (LanguageCards, CurrencyConverter and Main App Component remain the same)
+const LanguageCards = ({ lang }) => {
+  const [activeCategory, setActiveCategory] = useState("基本");
+  const [searchTerm, setSearchTerm] = useState("");
+  const t = TRANSLATIONS[lang];
+  
+  const handleSpeak = (text) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("您的瀏覽器不支援語音播放");
+    }
+  };
+
+  useEffect(() => {
+    setActiveCategory(PHRASES_DATA[0].category[lang]);
+  }, [lang]);
+
+  const getDisplayItems = () => {
+    if (searchTerm.trim() !== "") {
+      const allItems = PHRASES_DATA.flatMap(cat => cat.items);
+      return allItems.filter(item => 
+        item.zh.includes(searchTerm) || 
+        item.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.ko.includes(searchTerm) ||
+        item.pron.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    return PHRASES_DATA.find(c => c.category[lang] === activeCategory)?.items || [];
+  };
+
+  const displayedItems = getDisplayItems();
+
+  return (
+    <div className="pb-24 animate-fade-in h-full flex flex-col">
+      {/* Search Bar */}
+      <div className="relative mb-4">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search size={16} className="text-stone-400" />
+        </div>
+        <input 
+          type="text" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={t.phrases.searchPlaceholder}
+          className="w-full pl-10 pr-10 py-3 bg-white border border-stone-200 rounded-xl text-sm text-blue-950 placeholder-stone-400 focus:outline-none focus:border-blue-950 focus:ring-1 focus:ring-blue-950 transition-all"
+        />
+        {searchTerm && (
+          <button 
+            onClick={() => setSearchTerm("")}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-400 hover:text-red-500"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </div>
+
+      {/* Category Tabs */}
+      {!searchTerm && (
+        <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+          {PHRASES_DATA.map(cat => (
+            <button
+              key={cat.category[lang]}
+              onClick={() => setActiveCategory(cat.category[lang])}
+              className={`px-5 py-2 rounded-full whitespace-nowrap text-xs font-bold tracking-wide transition-all border ${
+                activeCategory === cat.category[lang]
+                  ? 'bg-blue-950 text-white border-blue-950 shadow-md'
+                  : 'bg-white text-stone-500 border-stone-200 hover:border-blue-900/30'
+              }`}
+            >
+              {cat.category[lang]}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Search Result Feedback */}
+      {searchTerm && (
+        <div className="mb-4 flex items-center justify-between px-1">
+          <span className="text-xs font-bold text-blue-950">{t.phrases.searchResult} ({displayedItems.length})</span>
+          <button onClick={() => setSearchTerm("")} className="text-xs text-red-500 font-medium">{t.phrases.clear}</button>
+        </div>
+      )}
+
+      {/* Cards List */}
+      <div className="space-y-3 flex-1 overflow-y-auto">
+        {displayedItems.length > 0 ? (
+          displayedItems.map((item, idx) => (
+            <div key={idx} className="bg-white p-5 rounded-xl border border-stone-200 relative group active:scale-[0.99] transition-transform duration-100 shadow-sm hover:border-blue-900/20">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">{t.phrases.sourceLabel}</span>
+                  <h3 className="text-lg font-bold text-blue-950">{item[lang]}</h3>
+                </div>
+                <button 
+                  onClick={() => handleSpeak(item.ko)}
+                  className="p-3 bg-[#FDFBF7] text-stone-400 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors"
+                  aria-label="Play audio"
+                >
+                  <Volume2 size={18} />
+                </button>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-stone-100 flex flex-col gap-1">
+                <span className="text-[10px] text-red-500 font-bold tracking-wider uppercase">{t.phrases.targetLabel}</span>
+                <p className="text-xl font-medium text-slate-800 font-sans">{item.ko}</p>
+                <p className="text-xs text-stone-400 font-mono mt-0.5">{item.pron}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-10 text-stone-400 flex flex-col items-center">
+             <p className="text-sm font-bold text-blue-950 mb-2">{t.phrases.notFound.replace('{term}', searchTerm)}</p>
+             <p className="text-xs mb-4">{t.phrases.tryTranslate}</p>
+             <a 
+               href={`https://translate.google.com/?sl=${lang === 'zh' ? 'zh-TW' : 'en'}&tl=ko&text=${encodeURIComponent(searchTerm)}&op=translate`}
+               target="_blank"
+               rel="noopener noreferrer"
+               className="flex items-center gap-2 bg-blue-950 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-900/20 hover:bg-blue-900 transition-colors"
+             >
+               <span>{t.phrases.googleTranslate}</span>
+               <ExternalLink size={14} />
+             </a>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const CurrencyConverter = ({ lang }) => {
+  const [krw, setKrw] = useState("");
+  const [twd, setTwd] = useState("");
+  const [rate, setRate] = useState(lang === 'zh' ? 42.5 : 1750); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState("...");
+  const [direction, setDirection] = useState("KRW_TO_TWD"); 
+  const t = TRANSLATIONS[lang];
+  const currencyCode = t.currency.targetCode; 
+
+  useEffect(() => {
+    setKrw("");
+    setTwd("");
+    setDirection("KRW_TO_TWD");
+    setRate(lang === 'zh' ? 42.5 : 1750);
+  }, [lang]);
+
+  const fetchRate = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${currencyCode}`);
+      const data = await response.json();
+      if (data && data.rates && data.rates.KRW) {
+        setRate(data.rates.KRW);
+        const now = new Date();
+        setLastUpdated(`${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`);
+      }
+    } catch (error) {
+      console.error("Failed to fetch rate", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRate();
+  }, [currencyCode]);
+
+  const handleKrwChange = (val) => {
+    const value = val.replace(/[^0-9.]/g, '');
+    setKrw(value);
+    if (value) {
+      setTwd((parseFloat(value) / rate).toFixed(currencyCode === 'GBP' ? 2 : 0));
+    } else {
+      setTwd("");
+    }
+  };
+
+  const handleTwdChange = (val) => {
+    const value = val.replace(/[^0-9.]/g, '');
+    setTwd(value);
+    if (value) {
+      setKrw((parseFloat(value) * rate).toFixed(0));
+    } else {
+      setKrw("");
+    }
+  };
+
+  return (
+    <div className="pb-24 animate-fade-in flex flex-col h-full">
+      {/* Rate Status Card */}
+      <div className="mb-4 bg-white border border-stone-200 rounded-lg p-4 flex justify-between items-center shadow-sm">
+        <div className="flex items-center gap-3">
+           <div className={`p-1.5 rounded-full ${isLoading ? 'bg-stone-100 animate-spin' : 'bg-[#FDFBF7]'}`}>
+             <RefreshCw size={14} className="text-stone-400" />
+           </div>
+           <div>
+             <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">{t.currency.rateTitle}</p>
+             <p className="text-sm font-bold text-blue-950">1 {t.currency.targetLabel} ≈ {rate.toFixed(2)} {t.currency.krwLabel}</p>
+           </div>
+        </div>
+        <div className="text-[10px] text-stone-400 text-right">
+          {t.currency.updated}<br/>{lastUpdated}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-8 border border-stone-200 mb-4 text-center shadow-sm relative overflow-hidden">
+        <div className="relative z-10 flex flex-col gap-8">
+          {/* KRW Input */}
+          <div className={`transition-all duration-300 ${direction === 'KRW_TO_TWD' ? 'order-1' : 'order-3'}`}>
+             <label className="flex items-center justify-center gap-2 text-xs font-bold text-stone-400 mb-2 tracking-widest uppercase">
+               <span>🇰🇷 {t.currency.krwLabel}</span>
+             </label>
+             <div className="relative inline-block w-full">
+               <input
+                 type="text"
+                 inputMode="decimal"
+                 value={krw}
+                 onChange={(e) => handleKrwChange(e.target.value)}
+                 placeholder="0"
+                 className={`w-full text-4xl font-light text-center p-2 bg-transparent focus:outline-none placeholder-stone-200 transition-all ${direction === 'KRW_TO_TWD' ? 'text-blue-950' : 'text-stone-300 scale-95'}`}
+               />
+             </div>
+          </div>
+
+          {/* Switch Button */}
+          <div className="order-2 flex justify-center relative py-2">
+             <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-full h-[1px] bg-stone-100"></div>
+             </div>
+             <button 
+              onClick={() => {
+                setDirection(prev => prev === 'KRW_TO_TWD' ? 'TWD_TO_KRW' : 'KRW_TO_TWD');
+              }}
+              className="group relative z-10 bg-[#FDFBF7] border border-stone-200 p-3 rounded-full text-stone-400 hover:text-red-500 hover:border-red-200 transition-all active:scale-95"
+            >
+              <ArrowRightLeft size={16} className="group-hover:rotate-180 transition-transform duration-500" />
+            </button>
+          </div>
+
+          {/* TWD Input */}
+          <div className={`transition-all duration-300 ${direction === 'KRW_TO_TWD' ? 'order-3' : 'order-1'}`}>
+             <label className="flex items-center justify-center gap-2 text-xs font-bold text-stone-400 mb-2 tracking-widest uppercase">
+                <span>{currencyCode === 'TWD' ? '🇹🇼' : '🇬🇧'} {t.currency.targetLabel}</span>
+             </label>
+             <div className="relative inline-block w-full">
+               <input
+                 type="text"
+                 inputMode="decimal"
+                 value={twd}
+                 onChange={(e) => handleTwdChange(e.target.value)}
+                 placeholder="0"
+                 className={`w-full text-4xl font-light text-center p-2 bg-transparent focus:outline-none placeholder-stone-200 transition-all ${direction === 'KRW_TO_TWD' ? 'text-stone-300 scale-95' : 'text-blue-950'}`}
+               />
+             </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Quick Tips */}
+      <h3 className="text-xs font-bold text-blue-950 mb-3 ml-1 tracking-widest uppercase">{t.currency.quickRef}</h3>
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          { label: t.currency.refItems.subway, sub:"1,500₩", val: (1500/rate).toFixed(currencyCode === 'GBP' ? 2 : 0) },
+          { label: t.currency.refItems.latte, sub:"5,000₩", val: (5000/rate).toFixed(currencyCode === 'GBP' ? 2 : 0) },
+          { label: t.currency.refItems.meal, sub:"10,000₩", val: (10000/rate).toFixed(currencyCode === 'GBP' ? 2 : 0) },
+          { label: t.currency.refItems.feast, sub:"50,000₩", val: (50000/rate).toFixed(currencyCode === 'GBP' ? 2 : 0) },
+        ].map((item, idx) => (
+          <div key={idx} className="bg-white p-3 rounded-lg border border-stone-200 flex justify-between items-center px-4 hover:border-blue-900/30 transition-colors">
+            <div className="flex flex-col">
+              <span className="text-xs text-stone-500 font-bold">{item.label}</span>
+              <span className="text-[10px] text-stone-300">{item.sub}</span>
+            </div>
+            <span className="font-bold text-blue-950 text-sm">{item.val} <span className="text-[10px] text-stone-400">{t.currency.targetCode}</span></span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // --- Main App Component ---
 
@@ -847,9 +1134,10 @@ export default function App() {
     }
   }, []);
 
-  // Fetch Real Weather Logic (Still fetching Open-Meteo for data display)
+  // Fetch Real Weather Logic
   useEffect(() => {
     const fetchWeather = async () => {
+      // 1. Define locations
       const locations = [
         { name: 'Busan', lat: 35.1796, lon: 129.0756 }, // Days 1, 3, 4, 5
         { name: 'Gyeongju', lat: 35.8562, lon: 129.2247 } // Day 2
@@ -866,12 +1154,14 @@ export default function App() {
           
           if (data.daily) {
              data.daily.time.forEach((date, index) => {
+                // Map WMO codes to simple types
                 let weatherType = 'sunny';
                 const code = data.daily.weathercode[index];
                 if (code > 2) weatherType = 'cloudy';
                 if (code > 50) weatherType = 'rain';
                 if (code > 70) weatherType = 'snow';
 
+                // Check which itinerary day this matches
                 ITINERARY_DATA.forEach(day => {
                     const matchesLoc = (day.isGyeongju && loc.name === 'Gyeongju') || (!day.isGyeongju && loc.name === 'Busan');
                     if (day.realDate === date && matchesLoc) {
